@@ -1,11 +1,13 @@
 from aiogram import Bot, Dispatcher, Router
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.fsm.storage.redis import RedisStorage
 
 from redis.asyncio import Redis as AsyncRedis
 
-from settings.conf import BOT_TOKEN, DEBUG, REDIS_URL
+from settings.conf import BOT_TOKEN, DEBUG, PROXY_URL, REDIS_URL
 
-bot = Bot(token=BOT_TOKEN)
+session = AiohttpSession(proxy=PROXY_URL) if PROXY_URL else AiohttpSession()
+bot = Bot(token=BOT_TOKEN, session=session)
 router = Router(name='main_router')
 storage: RedisStorage | None = None
 if not DEBUG:
