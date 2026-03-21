@@ -106,7 +106,7 @@ jobs:
       - check
       - build
     env:
-      APP_NAME: gamedi
+      APP_NAME: edelya_bot
     if: always() && startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Send Telegram Notification
