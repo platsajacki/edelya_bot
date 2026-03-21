@@ -59,7 +59,7 @@ def get_logging_dict(
             },
             'loki': {
                 'level': 'DEBUG',
-                'class': 'logging_handlers.SafeLokiQueueHandler',
+                'class': 'settings.logging_handlers.SafeLokiQueueHandler',
                 'url': f'http://{loki_container}/loki/api/v1/push',
                 'tags': {'application': loki_app_name},
                 'version': '1',
