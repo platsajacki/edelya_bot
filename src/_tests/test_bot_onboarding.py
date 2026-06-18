@@ -17,6 +17,7 @@ from bot.buttons import (
     get_help_topic_keyboard,
     get_how_it_works_keyboard,
 )
+from bot.commands import BOT_COMMANDS
 from bot.messages import (
     CONTACT_MESSAGE,
     HELP_MESSAGE,
@@ -96,14 +97,12 @@ class TestBotOnboardingKeyboards:
 
     def test_first_how_it_works_keyboard_has_next_action(self) -> None:
         keyboard = get_how_it_works_keyboard(step_index=0, total_steps=3)
-
         assert len(keyboard.inline_keyboard) == 1
         assert keyboard.inline_keyboard[0][0].text == 'Дальше →'
         assert keyboard.inline_keyboard[0][0].callback_data == HOW_IT_WORKS_NEXT_CALLBACK
 
     def test_middle_how_it_works_keyboard_has_back_and_next_actions(self) -> None:
         keyboard = get_how_it_works_keyboard(step_index=1, total_steps=3)
-
         assert len(keyboard.inline_keyboard) == 1
         assert [button.text for button in keyboard.inline_keyboard[0]] == ['← Назад', 'Дальше →']
         assert [button.callback_data for button in keyboard.inline_keyboard[0]] == [
@@ -113,7 +112,6 @@ class TestBotOnboardingKeyboards:
 
     def test_last_how_it_works_keyboard_has_back_and_finish_actions(self) -> None:
         keyboard = get_how_it_works_keyboard(step_index=2, total_steps=3)
-
         assert len(keyboard.inline_keyboard) == 1
         assert [button.text for button in keyboard.inline_keyboard[0]] == ['← Назад', 'Продолжить →']
         assert [button.callback_data for button in keyboard.inline_keyboard[0]] == [
@@ -123,7 +121,6 @@ class TestBotOnboardingKeyboards:
 
     def test_help_keyboard_has_topic_actions_and_contact(self) -> None:
         keyboard = get_help_keyboard()
-
         assert [row[0].text for row in keyboard.inline_keyboard[:-1]] == [topic.title for topic in HELP_TOPICS]
         assert [row[0].callback_data for row in keyboard.inline_keyboard[:-1]] == [
             topic.callback_data for topic in HELP_TOPICS
@@ -135,10 +132,18 @@ class TestBotOnboardingKeyboards:
 
     def test_help_topic_keyboard_has_open_back_and_contact_actions(self) -> None:
         keyboard = get_help_topic_keyboard()
-
         assert keyboard.inline_keyboard[0][0].text == OPEN_APP_BUTTON_TEXT
         assert keyboard.inline_keyboard[1][0].callback_data == HELP_BACK_CALLBACK
         assert keyboard.inline_keyboard[2][0].text == 'Связаться с нами'
+
+
+class TestBotCommands:
+    def test_bot_commands_have_start_help_and_contact_actions(self) -> None:
+        assert [(command.command, command.description) for command in BOT_COMMANDS] == [
+            ('start', 'Начать планировать неделю'),
+            ('help', 'Помощь'),
+            ('contact', 'Связаться с нами'),
+        ]
 
 
 class TestBotOnboardingState:
@@ -150,7 +155,6 @@ class TestBotOnboardingState:
 
     def test_next_callback_does_not_go_after_last_step(self) -> None:
         last_step_index = len(HOW_IT_WORKS_STEPS) - 1
-
         assert (
             get_how_it_works_step_index(HOW_IT_WORKS_NEXT_CALLBACK, current_step_index=last_step_index)
             == last_step_index
@@ -158,5 +162,4 @@ class TestBotOnboardingState:
 
     def test_get_help_topic_returns_topic_by_callback_data(self) -> None:
         topic = HELP_TOPICS[0]
-
         assert get_help_topic(topic.callback_data) == topic

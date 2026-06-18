@@ -1,4 +1,5 @@
 from aiogram import F
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
@@ -17,13 +18,32 @@ from settings.conf import SUPPORT_EMAIL
 HELP_TOPIC_CALLBACKS = {topic.callback_data for topic in HELP_TOPICS}
 
 
+async def send_help_message(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await message.answer(HELP_MESSAGE, reply_markup=get_help_keyboard())
+
+
+async def send_contact_message(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await message.answer(CONTACT_MESSAGE.format(email=SUPPORT_EMAIL))
+
+
+@router.message(Command('help'))
+async def help_command_handler(message: Message, state: FSMContext) -> None:
+    await send_help_message(message, state)
+
+
+@router.message(Command('contact'))
+async def contact_command_handler(message: Message, state: FSMContext) -> None:
+    await send_contact_message(message, state)
+
+
 @router.callback_query(F.data == HELP_START_CALLBACK)
 async def start_help_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
     if not isinstance(callback.message, Message):
         await callback.answer()
         return
-    await state.clear()
-    await callback.message.answer(HELP_MESSAGE, reply_markup=get_help_keyboard())
+    await send_help_message(callback.message, state)
     await callback.answer()
 
 
@@ -42,8 +62,7 @@ async def contact_callback_handler(callback: CallbackQuery, state: FSMContext) -
     if not isinstance(callback.message, Message):
         await callback.answer()
         return
-    await state.clear()
-    await callback.message.answer(CONTACT_MESSAGE.format(email=SUPPORT_EMAIL))
+    await send_contact_message(callback.message, state)
     await callback.answer()
 
 
