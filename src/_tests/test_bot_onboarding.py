@@ -5,11 +5,14 @@ from bot.buttons import (
     HELP_BACK_CALLBACK,
     HELP_START_CALLBACK,
     HOW_IT_WORKS_BACK_CALLBACK,
+    HOW_IT_WORKS_FINISH_CALLBACK,
     HOW_IT_WORKS_NEXT_CALLBACK,
     HOW_IT_WORKS_START_CALLBACK,
     OPEN_APP_BUTTON_TEXT,
     OPEN_APP_KEYBOARD,
     START_KEYBOARD,
+    START_PLANNING_BUTTON_TEXT,
+    START_PLANNING_KEYBOARD,
     get_help_keyboard,
     get_help_topic_keyboard,
     get_how_it_works_keyboard,
@@ -18,6 +21,7 @@ from bot.messages import (
     CONTACT_MESSAGE,
     HELP_MESSAGE,
     HELP_TOPICS,
+    HOW_IT_WORKS_FINAL_MESSAGE,
     HOW_IT_WORKS_STEPS,
     START_MESSAGE,
     HelpTopic,
@@ -48,6 +52,11 @@ class TestBotOnboardingMessages:
         assert HOW_IT_WORKS_STEPS[1].text.startswith('2. Запланируйте готовку')
         assert HOW_IT_WORKS_STEPS[2].text.startswith('3. Получите список покупок')
 
+    def test_how_it_works_final_message_reduces_first_step_friction(self) -> None:
+        assert 'Не нужно составлять идеальное меню сразу' in HOW_IT_WORKS_FINAL_MESSAGE
+        assert 'Начните с одного блюда' in HOW_IT_WORKS_FINAL_MESSAGE
+        assert 'Первые 14 дней — бесплатно' in HOW_IT_WORKS_FINAL_MESSAGE
+
     def test_help_has_short_menu_and_topics(self) -> None:
         assert HELP_MESSAGE == 'С чем помочь?'
         assert SUPPORT_EMAIL in CONTACT_MESSAGE.format(email=SUPPORT_EMAIL)
@@ -65,7 +74,7 @@ class TestBotOnboardingKeyboards:
         primary_button = START_KEYBOARD.inline_keyboard[0][0]
         explanation_button = START_KEYBOARD.inline_keyboard[1][0]
 
-        assert primary_button.text == OPEN_APP_BUTTON_TEXT
+        assert primary_button.text == START_PLANNING_BUTTON_TEXT
         assert primary_button.web_app is not None
         assert explanation_button.text == 'Как это работает'
         assert explanation_button.callback_data == HOW_IT_WORKS_START_CALLBACK
@@ -80,29 +89,37 @@ class TestBotOnboardingKeyboards:
         assert len(OPEN_APP_KEYBOARD.inline_keyboard[0]) == 1
         assert OPEN_APP_KEYBOARD.inline_keyboard[0][0].text == OPEN_APP_BUTTON_TEXT
 
-    def test_first_how_it_works_keyboard_has_next_and_open_app_actions(self) -> None:
+    def test_start_planning_keyboard_has_only_primary_action(self) -> None:
+        assert len(START_PLANNING_KEYBOARD.inline_keyboard) == 1
+        assert len(START_PLANNING_KEYBOARD.inline_keyboard[0]) == 1
+        assert START_PLANNING_KEYBOARD.inline_keyboard[0][0].text == START_PLANNING_BUTTON_TEXT
+
+    def test_first_how_it_works_keyboard_has_next_action(self) -> None:
         keyboard = get_how_it_works_keyboard(step_index=0, total_steps=3)
 
-        assert keyboard.inline_keyboard[0][0].text == 'Дальше'
+        assert len(keyboard.inline_keyboard) == 1
+        assert keyboard.inline_keyboard[0][0].text == 'Дальше →'
         assert keyboard.inline_keyboard[0][0].callback_data == HOW_IT_WORKS_NEXT_CALLBACK
-        assert keyboard.inline_keyboard[1][0].text == OPEN_APP_BUTTON_TEXT
 
-    def test_middle_how_it_works_keyboard_has_back_next_and_open_app_actions(self) -> None:
+    def test_middle_how_it_works_keyboard_has_back_and_next_actions(self) -> None:
         keyboard = get_how_it_works_keyboard(step_index=1, total_steps=3)
 
-        assert [button.text for button in keyboard.inline_keyboard[0]] == ['Назад', 'Дальше']
+        assert len(keyboard.inline_keyboard) == 1
+        assert [button.text for button in keyboard.inline_keyboard[0]] == ['← Назад', 'Дальше →']
         assert [button.callback_data for button in keyboard.inline_keyboard[0]] == [
             HOW_IT_WORKS_BACK_CALLBACK,
             HOW_IT_WORKS_NEXT_CALLBACK,
         ]
-        assert keyboard.inline_keyboard[1][0].text == OPEN_APP_BUTTON_TEXT
 
-    def test_last_how_it_works_keyboard_has_back_and_open_app_actions(self) -> None:
+    def test_last_how_it_works_keyboard_has_back_and_finish_actions(self) -> None:
         keyboard = get_how_it_works_keyboard(step_index=2, total_steps=3)
 
-        assert keyboard.inline_keyboard[0][0].text == 'Назад'
-        assert keyboard.inline_keyboard[0][0].callback_data == HOW_IT_WORKS_BACK_CALLBACK
-        assert keyboard.inline_keyboard[1][0].text == OPEN_APP_BUTTON_TEXT
+        assert len(keyboard.inline_keyboard) == 1
+        assert [button.text for button in keyboard.inline_keyboard[0]] == ['← Назад', 'Продолжить →']
+        assert [button.callback_data for button in keyboard.inline_keyboard[0]] == [
+            HOW_IT_WORKS_BACK_CALLBACK,
+            HOW_IT_WORKS_FINISH_CALLBACK,
+        ]
 
     def test_help_keyboard_has_topic_actions_and_contact(self) -> None:
         keyboard = get_help_keyboard()

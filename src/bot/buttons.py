@@ -9,9 +9,11 @@ CONTACT_CALLBACK = f'{HELP_CALLBACK_PREFIX}:contact'
 HELP_START_CALLBACK = f'{HELP_CALLBACK_PREFIX}:start'
 HOW_IT_WORKS_CALLBACK_PREFIX = 'how_it_works'
 HOW_IT_WORKS_BACK_CALLBACK = f'{HOW_IT_WORKS_CALLBACK_PREFIX}:back'
+HOW_IT_WORKS_FINISH_CALLBACK = f'{HOW_IT_WORKS_CALLBACK_PREFIX}:finish'
 HOW_IT_WORKS_NEXT_CALLBACK = f'{HOW_IT_WORKS_CALLBACK_PREFIX}:next'
 HOW_IT_WORKS_START_CALLBACK = f'{HOW_IT_WORKS_CALLBACK_PREFIX}:start'
 OPEN_APP_BUTTON_TEXT = 'Открыть Еделю'
+START_PLANNING_BUTTON_TEXT = 'Начать планировать неделю'
 
 MINI_APP = WebAppInfo(url=MINI_APP_URL)
 
@@ -28,29 +30,28 @@ def get_how_it_works_keyboard(step_index: int, total_steps: int) -> InlineKeyboa
     if step_index > 0:
         navigation_buttons.append(
             InlineKeyboardButton(
-                text='Назад',
+                text='← Назад',
                 callback_data=HOW_IT_WORKS_BACK_CALLBACK,
             ),
         )
     if step_index < total_steps - 1:
         navigation_buttons.append(
             InlineKeyboardButton(
-                text='Дальше',
+                text='Дальше →',
                 callback_data=HOW_IT_WORKS_NEXT_CALLBACK,
+            ),
+        )
+    else:
+        navigation_buttons.append(
+            InlineKeyboardButton(
+                text='Продолжить →',
+                callback_data=HOW_IT_WORKS_FINISH_CALLBACK,
             ),
         )
 
     inline_keyboard = []
     if navigation_buttons:
         inline_keyboard.append(navigation_buttons)
-    inline_keyboard.append(
-        [
-            InlineKeyboardButton(
-                text=OPEN_APP_BUTTON_TEXT,
-                web_app=MINI_APP,
-            ),
-        ],
-    )
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 
@@ -92,7 +93,7 @@ START_KEYBOARD = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(
-                text=OPEN_APP_BUTTON_TEXT,
+                text=START_PLANNING_BUTTON_TEXT,
                 web_app=MINI_APP,
             ),
         ],
@@ -118,6 +119,18 @@ OPEN_APP_KEYBOARD = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(
                 text=OPEN_APP_BUTTON_TEXT,
+                web_app=MINI_APP,
+            ),
+        ],
+    ],
+)
+
+
+START_PLANNING_KEYBOARD = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text=START_PLANNING_BUTTON_TEXT,
                 web_app=MINI_APP,
             ),
         ],

@@ -8,6 +8,7 @@ from bot.buttons import (
 from bot.messages import HELP_TOPICS, HOW_IT_WORKS_STEPS, HelpTopic
 
 HOW_IT_WORKS_STEP_INDEX_KEY = 'how_it_works_step_index'
+HOW_IT_WORKS_FINISHED_KEY = 'how_it_works_finished'
 
 
 def get_how_it_works_step_index(callback_data: str | None, current_step_index: int) -> int | None:
