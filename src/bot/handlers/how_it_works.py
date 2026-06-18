@@ -2,7 +2,12 @@ from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto, Message
 
-from bot.buttons import HOW_IT_WORKS_CALLBACK_PREFIX, HOW_IT_WORKS_START_CALLBACK, get_how_it_works_keyboard
+from bot.buttons import (
+    HOW_IT_WORKS_BACK_CALLBACK,
+    HOW_IT_WORKS_NEXT_CALLBACK,
+    HOW_IT_WORKS_START_CALLBACK,
+    get_how_it_works_keyboard,
+)
 from bot.creation import router
 from bot.messages import HOW_IT_WORKS_STEPS, HowItWorksStep
 from bot.services.onboarding import (
@@ -31,21 +36,36 @@ async def edit_how_it_works_step(message: Message, step: HowItWorksStep, step_in
     await message.edit_text(step.text, reply_markup=reply_markup)
 
 
-@router.callback_query(F.data.startswith(f'{HOW_IT_WORKS_CALLBACK_PREFIX}:'))
-async def how_it_works_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
+async def set_how_it_works_step(state: FSMContext, step_index: int) -> None:
+    await state.set_state(OnboardingStates.how_it_works)
+    await state.update_data({HOW_IT_WORKS_STEP_INDEX_KEY: step_index})
+
+
+@router.callback_query(F.data == HOW_IT_WORKS_START_CALLBACK)
+async def start_how_it_works_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
     if not isinstance(callback.message, Message):
         await callback.answer()
         return
+
+    step_index = 0
+    await set_how_it_works_step(state, step_index)
+    await send_how_it_works_step(callback.message, step_index)
+    await callback.answer()
+
+
+@router.callback_query(F.data == HOW_IT_WORKS_BACK_CALLBACK)
+@router.callback_query(F.data == HOW_IT_WORKS_NEXT_CALLBACK)
+async def navigate_how_it_works_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
+    if not isinstance(callback.message, Message):
+        await callback.answer()
+        return
+
     current_step_index = await get_current_how_it_works_step_index(state)
     step_index = get_how_it_works_step_index(callback.data, current_step_index)
     if step_index is None:
         await callback.answer()
         return
-    await state.set_state(OnboardingStates.how_it_works)
-    await state.update_data({HOW_IT_WORKS_STEP_INDEX_KEY: step_index})
-    if callback.data == HOW_IT_WORKS_START_CALLBACK:
-        await send_how_it_works_step(callback.message, step_index)
-        await callback.answer()
-        return
+
+    await set_how_it_works_step(state, step_index)
     await edit_how_it_works_step(callback.message, HOW_IT_WORKS_STEPS[step_index], step_index)
     await callback.answer()

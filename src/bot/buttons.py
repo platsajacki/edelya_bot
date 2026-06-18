@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from aiogram.types import CopyTextButton, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from bot.messages import HELP_TOPICS
 from settings.conf import MINI_APP_URL, SUPPORT_EMAIL
@@ -18,7 +18,7 @@ MINI_APP = WebAppInfo(url=MINI_APP_URL)
 def get_contact_button() -> InlineKeyboardButton:
     return InlineKeyboardButton(
         text='Связаться с нами',
-        url=f'mailto:{SUPPORT_EMAIL}',
+        copy_text=CopyTextButton(text=SUPPORT_EMAIL),
     )
 
 

@@ -4,30 +4,43 @@ from aiogram.types import CallbackQuery, Message
 
 from bot.buttons import (
     HELP_BACK_CALLBACK,
-    HELP_CALLBACK_PREFIX,
     HELP_START_CALLBACK,
     get_help_keyboard,
     get_help_topic_keyboard,
 )
 from bot.creation import router
-from bot.messages import HELP_MESSAGE
+from bot.messages import HELP_MESSAGE, HELP_TOPICS
 from bot.services.onboarding import get_help_topic
 
+HELP_TOPIC_CALLBACKS = {topic.callback_data for topic in HELP_TOPICS}
 
-@router.callback_query(F.data.startswith(f'{HELP_CALLBACK_PREFIX}:'))
-async def help_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
+
+@router.callback_query(F.data == HELP_START_CALLBACK)
+async def start_help_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
     if not isinstance(callback.message, Message):
         await callback.answer()
         return
     await state.clear()
-    if callback.data == HELP_START_CALLBACK:
-        await callback.message.answer(HELP_MESSAGE, reply_markup=get_help_keyboard())
+    await callback.message.answer(HELP_MESSAGE, reply_markup=get_help_keyboard())
+    await callback.answer()
+
+
+@router.callback_query(F.data == HELP_BACK_CALLBACK)
+async def back_to_help_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
+    if not isinstance(callback.message, Message):
         await callback.answer()
         return
-    if callback.data == HELP_BACK_CALLBACK:
-        await callback.message.edit_text(HELP_MESSAGE, reply_markup=get_help_keyboard())
+    await state.clear()
+    await callback.message.edit_text(HELP_MESSAGE, reply_markup=get_help_keyboard())
+    await callback.answer()
+
+
+@router.callback_query(F.data.in_(HELP_TOPIC_CALLBACKS))
+async def help_topic_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
+    if not isinstance(callback.message, Message):
         await callback.answer()
         return
+    await state.clear()
     topic = get_help_topic(callback.data)
     if topic is None:
         await callback.answer()

@@ -15,6 +15,7 @@ from bot.buttons import (
 )
 from bot.messages import HELP_MESSAGE, HELP_TOPICS, HOW_IT_WORKS_STEPS, START_MESSAGE, HelpTopic, HowItWorksStep
 from bot.services.onboarding import get_help_topic, get_how_it_works_step_index
+from settings.conf import SUPPORT_EMAIL
 
 
 class TestBotOnboardingMessages:
@@ -60,9 +61,10 @@ class TestBotOnboardingKeyboards:
         assert explanation_button.callback_data == HOW_IT_WORKS_START_CALLBACK
         assert [button.text for button in START_KEYBOARD.inline_keyboard[2]] == ['Помощь', 'Связаться с нами']
         assert START_KEYBOARD.inline_keyboard[2][0].callback_data == HELP_START_CALLBACK
-        contact_url = START_KEYBOARD.inline_keyboard[2][1].url
-        assert contact_url is not None
-        assert contact_url.startswith('mailto:')
+        contact_button = START_KEYBOARD.inline_keyboard[2][1]
+        assert contact_button.url is None
+        assert contact_button.copy_text is not None
+        assert contact_button.copy_text.text == SUPPORT_EMAIL
 
     def test_open_app_keyboard_has_only_primary_action(self) -> None:
         assert len(OPEN_APP_KEYBOARD.inline_keyboard) == 1
@@ -101,9 +103,10 @@ class TestBotOnboardingKeyboards:
             topic.callback_data for topic in HELP_TOPICS
         ]
         assert keyboard.inline_keyboard[-1][0].text == 'Связаться с нами'
-        contact_url = keyboard.inline_keyboard[-1][0].url
-        assert contact_url is not None
-        assert contact_url.startswith('mailto:')
+        contact_button = keyboard.inline_keyboard[-1][0]
+        assert contact_button.url is None
+        assert contact_button.copy_text is not None
+        assert contact_button.copy_text.text == SUPPORT_EMAIL
 
     def test_help_topic_keyboard_has_open_back_and_contact_actions(self) -> None:
         keyboard = get_help_topic_keyboard()
