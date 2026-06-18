@@ -1,6 +1,8 @@
 # Custom Python gitignore template for Python projects.
 debug.ipynb
 logs/
+.agents
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
