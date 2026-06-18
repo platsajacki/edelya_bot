@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from bot.buttons import (
+    CONTACT_CALLBACK,
     HELP_BACK_CALLBACK,
     HELP_START_CALLBACK,
     HOW_IT_WORKS_BACK_CALLBACK,
@@ -13,7 +14,15 @@ from bot.buttons import (
     get_help_topic_keyboard,
     get_how_it_works_keyboard,
 )
-from bot.messages import HELP_MESSAGE, HELP_TOPICS, HOW_IT_WORKS_STEPS, START_MESSAGE, HelpTopic, HowItWorksStep
+from bot.messages import (
+    CONTACT_MESSAGE,
+    HELP_MESSAGE,
+    HELP_TOPICS,
+    HOW_IT_WORKS_STEPS,
+    START_MESSAGE,
+    HelpTopic,
+    HowItWorksStep,
+)
 from bot.services.onboarding import get_help_topic, get_how_it_works_step_index
 from settings.conf import SUPPORT_EMAIL
 
@@ -41,6 +50,7 @@ class TestBotOnboardingMessages:
 
     def test_help_has_short_menu_and_topics(self) -> None:
         assert HELP_MESSAGE == 'С чем помочь?'
+        assert SUPPORT_EMAIL in CONTACT_MESSAGE.format(email=SUPPORT_EMAIL)
         assert all(isinstance(topic, HelpTopic) for topic in HELP_TOPICS)
         assert [topic.title for topic in HELP_TOPICS] == [
             'Как начать пользоваться',
@@ -63,8 +73,7 @@ class TestBotOnboardingKeyboards:
         assert START_KEYBOARD.inline_keyboard[2][0].callback_data == HELP_START_CALLBACK
         contact_button = START_KEYBOARD.inline_keyboard[2][1]
         assert contact_button.url is None
-        assert contact_button.copy_text is not None
-        assert contact_button.copy_text.text == SUPPORT_EMAIL
+        assert contact_button.callback_data == CONTACT_CALLBACK
 
     def test_open_app_keyboard_has_only_primary_action(self) -> None:
         assert len(OPEN_APP_KEYBOARD.inline_keyboard) == 1
@@ -105,8 +114,7 @@ class TestBotOnboardingKeyboards:
         assert keyboard.inline_keyboard[-1][0].text == 'Связаться с нами'
         contact_button = keyboard.inline_keyboard[-1][0]
         assert contact_button.url is None
-        assert contact_button.copy_text is not None
-        assert contact_button.copy_text.text == SUPPORT_EMAIL
+        assert contact_button.callback_data == CONTACT_CALLBACK
 
     def test_help_topic_keyboard_has_open_back_and_contact_actions(self) -> None:
         keyboard = get_help_topic_keyboard()

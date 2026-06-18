@@ -52,6 +52,7 @@ HOW_IT_WORKS_STEPS = (
 )
 
 HELP_MESSAGE = 'С чем помочь?'
+CONTACT_MESSAGE = 'Напишите нам на почту:\n\n{email}'
 
 HELP_TOPICS = (
     HelpTopic(

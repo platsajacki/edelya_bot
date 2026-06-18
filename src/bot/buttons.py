@@ -1,10 +1,11 @@
-from aiogram.types import CopyTextButton, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from bot.messages import HELP_TOPICS
-from settings.conf import MINI_APP_URL, SUPPORT_EMAIL
+from settings.conf import MINI_APP_URL
 
 HELP_BACK_CALLBACK = 'help:back'
 HELP_CALLBACK_PREFIX = 'help'
+CONTACT_CALLBACK = f'{HELP_CALLBACK_PREFIX}:contact'
 HELP_START_CALLBACK = f'{HELP_CALLBACK_PREFIX}:start'
 HOW_IT_WORKS_CALLBACK_PREFIX = 'how_it_works'
 HOW_IT_WORKS_BACK_CALLBACK = f'{HOW_IT_WORKS_CALLBACK_PREFIX}:back'
@@ -18,7 +19,7 @@ MINI_APP = WebAppInfo(url=MINI_APP_URL)
 def get_contact_button() -> InlineKeyboardButton:
     return InlineKeyboardButton(
         text='Связаться с нами',
-        copy_text=CopyTextButton(text=SUPPORT_EMAIL),
+        callback_data=CONTACT_CALLBACK,
     )
 
 
